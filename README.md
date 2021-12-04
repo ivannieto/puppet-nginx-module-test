@@ -18,12 +18,44 @@ This README file provides some light on the implementation of this automation.
 
 There is a [GUIDE](docs/RUN.md) where you can follow simple steps to bootstrap the infrastructure using Docker Compose.
 
+There are 3 networks defined, one for Puppet interactions, and 2 internal networks for requested IPs.
+
+I'm using *puppet/puppet-agent* and *puppet/puppetserver* Docker images, and both should be connected through *puppet* network.
+
 As the agent service needs the Puppet server to be active in order to request certificates we will add in Docker Compose a condition waiting for service to be healthy.
 
 ```bash
     depends_on:
       puppet-server:
         condition: service_healthy
+```
+
+I'm gonna override the *puppet-agent* *entrypoint.sh* file to provide SSL cert generation, update the container OS, add the format_log definition to NGINX conf and restart NGINX. It will also provide a command to keep the container alive **tail -f /dev/null**.
+
+```bash
+#!/bin/bash
+
+set -e
+
+AGENT_NAME=puppet-agent-nginx
+
+# Update machine
+apt update
+
+# Generate self-signed certificate
+mkdir -p /etc/ssl/private
+chmod 700 /etc/ssl/private
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/${AGENT_NAME}-selfsigned.key -out /etc/ssl/certs/${AGENT_NAME}-selfsigned.crt -batch
+puppet agent --verbose --onetime --no-daemonize --summarize
+
+# Add log_format to missing property from puppet-nginx generated file
+sed -i "1i log_format custom_format  '\$remote_addr - \$remote_user \$time_local \$request \$status \$body_bytes_sent \$http_referer';" /etc/nginx/sites-available/domain.com.conf
+service nginx reload
+service nginx restart
+
+# This avoids container from exit with 0 value
+tail -f /dev/null
+
 ```
 
 > I've been playing with PDK but for simplicity I've used a simple approach by loading init.pp module file through volumes into the Puppet server to provide our module.
@@ -107,6 +139,7 @@ Install nginx and apt modules in Puppet server
 
 ```bash
 docker exec -it puppet-server puppet module install puppet-nginx
+# Server will ask for APT module
 docker exec -it puppet-server puppet module install puppetlabs-apt
 # Restart stopped container to retrieve new facts from master (Not a new container as this is the one that contains the certificate)
 docker compose up -d
@@ -523,8 +556,6 @@ You can watch logs by using basic terminal commands:
 `tail -f /var/log/nginx/access.log`
 
 ### Summary
-
-I think it lacks the proxy to expose puppet-agent-nginx to internet overriding the current domain.com.
 
 Due to the amount of time invested in learning new concepts like Puppet (I'm used to Ansible), refreshing NGINX concepts (lot of time since my last config), fixing issues on-the-go and searching for documentation (scarce) in the internet about Puppet, and mostly the lack of time due to my current workload I have to provide this solution instead something more clear and working one. Will fix in later weeks.
 

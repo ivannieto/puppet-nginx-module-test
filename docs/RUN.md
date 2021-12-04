@@ -33,3 +33,7 @@
 - Turn down all services and networks in infrastructure.
 
   - `docker compose down`
+
+- If you need to rebuild all services.
+
+  - `docker compose up -d --force-recreate --build`
