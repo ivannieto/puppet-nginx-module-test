@@ -11,7 +11,7 @@ node 'domain.com' {
     ssl_cert          => '/etc/ssl/certs/puppet-agent-nginx-selfsigned.crt',
     ssl_key           => '/etc/ssl/private/puppet-agent-nginx-selfsigned.key',
     access_log        => '/var/log/nginx/access.log',
-    error_log         => '/var/log/nginx/access.log',
+    error_log         => '/var/log/nginx/error.log',
     proxy             => 'http://10.10.10.10:80',
   }
 
