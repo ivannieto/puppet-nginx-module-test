@@ -270,7 +270,11 @@ node 'domain.com' {
 }
 ```
 
-Gather the new facts
+Gather the new facts.
+
+We are using the following command as long as it's the extracted start command from entrypoint.sh from puppet-agent Docker image.
+
+`puppet agent --verbose --onetime --no-daemonize --summarize`
 
 ```bash
 root@domain:/# puppet agent --verbose --onetime --no-daemonize --summarize
