@@ -1,26 +1,26 @@
 services:
   nginx-1:
     container_name: nginx-1
-    image: nginx:alpine
+    image: "nginx:alpine"
     volumes:
-      - "./modules/nginx_module/files/html/index.10.html:/usr/share/nginx/html/index.html"
+      - ./modules/nginx_module/files/html/index.10.html:/usr/share/nginx/html/index.html
     networks:
       internal-1:
         ipv4_address: 10.10.10.10
 
   nginx-2:
     container_name: nginx-2
-    image: nginx:alpine
+    image: "nginx:alpine"
     volumes:
-      - "./modules/nginx_module/files/html/index.20.html:/usr/share/nginx/html/index.html"
+      - ./modules/nginx_module/files/html/index.20.html:/usr/share/nginx/html/index.html
     networks:
       internal-2:
         ipv4_address: 20.20.20.20
 
   puppet-server:
     container_name: puppet-server
-    image: puppet/puppetserver
-    hostname: puppet
+    image: "puppet/puppetserver:7.4.2"
+    hostname: "puppet"
     environment:
       - AUTOSIGN=true
       - USE_PUPPETDB=false
@@ -30,16 +30,16 @@ services:
       - CA_ALLOW_SUBJECT_ALT_NAMES=false
     restart: unless-stopped
     volumes:
-      - "./modules/nginx_module/manifests/init.pp:/etc/puppetlabs/code/environments/production/manifests/nginx_module.pp"
+      - ./modules/nginx_module/manifests/init.pp:/etc/puppetlabs/code/environments/production/manifests/nginx_module.pp
     networks:
       - puppet
 
   puppet-agent:
     container_name: puppet-agent-nginx
     hostname: "domain.com"
-    image: puppet/puppet-agent
+    image: "puppet/puppet-agent:7.12.0"
     volumes:
-      - "./modules/nginx_module/files/puppet-agent/entrypoint.sh:/root/entrypoint.sh"
+      - ./modules/nginx_module/files/puppet-agent/entrypoint.sh:/root/entrypoint.sh
     entrypoint: /root/entrypoint.sh
     depends_on:
       puppet-server:
@@ -51,53 +51,52 @@ services:
 
   # # Logging Stack
 
-
   mongodb:
-    image: mongo:4.2
+    image: "mongo:4.2"
     container_name: mongodb
     volumes:
-      - mongodb_data:/data/db
-    restart: on-failure
+      - "mongodb_data:/data/db"
+    restart: "on-failure"
     networks:
       - puppet
 
   elasticsearch:
     container_name: elasticsearch
     environment:
-      ES_JAVA_OPTS: -Xms1g -Xmx1g
-      bootstrap.memory_lock: true
-      discovery.type: single-node
-      http.host: 0.0.0.0
-      action.auto_create_index: false
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+      bootstrap.memory_lock: "true"
+      discovery.type: "single-node"
+      http.host: "0.0.0.0"
+      action.auto_create_index: "false"
+    image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
     ulimits:
       memlock:
         hard: -1
         soft: -1
     volumes:
-      - es_data:/usr/share/elasticsearch/data
-    restart: on-failure
+      - "es_data:/usr/share/elasticsearch/data"
+    restart: "on-failure"
     networks:
       - puppet
 
   graylog:
-    image: graylog/graylog:4.2
+    image: "graylog/graylog:4.2"
     container_name: graylog
     hostname: graylog
     depends_on:
       elasticsearch:
-        condition: service_started
+        condition: "service_started"
       mongodb:
-        condition: service_started
+        condition: "service_started"
     entrypoint: "/usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh"
     environment:
       GRAYLOG_NODE_ID_FILE: "/usr/share/graylog/data/config/node-id"
       GRAYLOG_PASSWORD_SECRET: ${GRAYLOG_PASSWORD_SECRET}
       GRAYLOG_ROOT_PASSWORD_SHA2: ${GRAYLOG_ROOT_PASSWORD_SHA2S}
-      GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
-      GRAYLOG_HTTP_EXTERNAL_URI: http://localhost:9000/
-      GRAYLOG_ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-      GRAYLOG_MONGODB_URI: mongodb://mongodb:27017/graylog
+      GRAYLOG_HTTP_BIND_ADDRESS: "0.0.0.0:9000"
+      GRAYLOG_HTTP_EXTERNAL_URI: "http://localhost:9000/"
+      GRAYLOG_ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
+      GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
     ports:
       - "5044:5044/tcp" # Beats
       - "5140:5140/udp" # Syslog UDP
@@ -113,7 +112,7 @@ services:
     volumes:
       - "graylog_data:/usr/share/graylog/data/data"
       - "graylog_journal:/usr/share/graylog/data/journal"
-    restart: on-failure
+    restart: "on-failure"
     networks:
       - puppet
 

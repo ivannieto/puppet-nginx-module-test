@@ -13,7 +13,12 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/${A
 puppet agent --verbose --onetime --no-daemonize --summarize
 
 # Add log_format to missing property from puppet-nginx generated file
-sed -i "1i log_format custom_format  '\$remote_addr - \$remote_user \$time_local \$request \$status \$body_bytes_sent \$http_referer';" /etc/nginx/sites-available/domain.com.conf
+sed -i "2i log_format custom_format  '\$remote_addr - \$remote_user \$time_local \$request \$status \$body_bytes_sent \$http_referer';" /etc/nginx/sites-available/domain.com.conf
+
+cat /etc/nginx/sites-available/domain.com.conf
+
+nginx -t
+
 service nginx reload
 service nginx restart
 

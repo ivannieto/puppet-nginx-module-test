@@ -20,7 +20,7 @@ There is a [GUIDE](docs/RUN.md) where you can follow simple steps to bootstrap t
 
 There are 3 networks defined, one for Puppet interactions, and 2 internal networks for requested IPs.
 
-I'm using *puppet/puppet-agent* and *puppet/puppetserver* Docker images, and both should be connected through *puppet* network.
+I'm using *puppet/puppet-agent:7.12.0* and *puppet/puppetserver:7.4.2* Docker images, and both should be connected through *puppet* network.
 
 As the agent service needs the Puppet server to be active in order to request certificates we will add in Docker Compose a condition waiting for service to be healthy.
 
@@ -471,8 +471,9 @@ I tried fluentd but having some issues with their containers and went into Grayl
 When starting UI for first time, use admin and the password generated previously and stated in graylog/.env file.
 
 Commands to generate passwords:
-GRAYLOG_PASSWORD_SECRET: `pwgen -N 1 -s 96`
-GRAYLOG_ROOT_PASSWORD_SHA2: `echo -n "Enter password: " && head -1 </dev/stdin | tr -d '\n' | sha256sum | cut -d" " -f1`
+
+  - GRAYLOG_PASSWORD_SECRET: `pwgen -N 1 -s 96`
+  - GRAYLOG_ROOT_PASSWORD_SHA2: `echo -n "Enter password: " && head -1 </dev/stdin | tr -d '\n' | sha256sum | cut -d" " -f1`
 
 ### Graylog troubleshooting
 
@@ -489,9 +490,9 @@ graylog@43b03fbf23c2:~$ sed -i 's/root_password_sha2 =.*/root_password_sha2 = /'
 graylog@43b03fbf23c2:~$ sed -i '/^root_password_sha2 =/ s/$/ e8c039209e898ce1fd9377e6e66b11bc13ec16493865e94e559f1ecc9552dbc0/' data/config/graylog.conf
 graylog@43b03fbf23c2:~$ sed -i '/^password_secret =/ s/$/ 2mt9umI90mhlamuuwH75prnoRkyCyIVUFI3XkMCVxt4AUNrJDobc7Z0MckvCStu2pMdMtlO3NsEuwpMbCHRn96ElhJYZ3gyQ/' data/config/graylog.conf
 
-List all configuration options without comments
+# List all configuration options without comments
 graylog@43b03fbf23c2:~$ sed -e '/^#/d' data/config/graylog.conf
-or
+# or
 graylog@43b03fbf23c2:~$ grep -v '^#' data/config/graylog.conf
 ```
 

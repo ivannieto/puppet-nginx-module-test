@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Docker installed in your system.
+- Docker ins talled in your system.
 
 ## Running
 
@@ -10,10 +10,10 @@
 
   - `docker compose up -d`
 
-- After agent has exited due to missing packages in Puppet server.
+- After agent has exited (or while container is in CREATED state) install required packages in Puppet server (latest versions gave me a headache, those are the ones that worked for me).
 
-  - `docker exec puppet-server puppet module install puppetlabs-apt`
-  - `docker exec puppet-server puppet module install puppet-nginx`
+  - `docker exec puppet-server puppet module install puppetlabs-apt --8.1.0`
+  - `docker exec puppet-server puppet module install puppet-nginx --version 3.2.0`
 
 - Restart exited container to gather facts from Puppet server.
 
