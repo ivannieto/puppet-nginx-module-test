@@ -3,7 +3,7 @@ services:
     container_name: nginx-1
     image: nginx:alpine
     volumes:
-      - ./modules/nginx_module/files/html/index.10.html:/usr/share/nginx/html/index.html
+      - "./modules/nginx_module/files/html/index.10.html:/usr/share/nginx/html/index.html"
     networks:
       internal-1:
         ipv4_address: 10.10.10.10
@@ -12,7 +12,7 @@ services:
     container_name: nginx-2
     image: nginx:alpine
     volumes:
-      - ./modules/nginx_module/files/html/index.20.html:/usr/share/nginx/html/index.html
+      - "./modules/nginx_module/files/html/index.20.html:/usr/share/nginx/html/index.html"
     networks:
       internal-2:
         ipv4_address: 20.20.20.20
@@ -30,7 +30,7 @@ services:
       - CA_ALLOW_SUBJECT_ALT_NAMES=false
     restart: unless-stopped
     volumes:
-      - ./modules/nginx_module/manifests/init.pp:/etc/puppetlabs/code/environments/production/manifests/nginx_module.pp
+      - "./modules/nginx_module/manifests/init.pp:/etc/puppetlabs/code/environments/production/manifests/nginx_module.pp"
     networks:
       - puppet
 
@@ -39,7 +39,7 @@ services:
     hostname: "domain.com"
     image: puppet/puppet-agent
     volumes:
-      - ./modules/nginx_module/files/puppet-agent/entrypoint.sh:/root/entrypoint.sh
+      - "./modules/nginx_module/files/puppet-agent/entrypoint.sh:/root/entrypoint.sh"
     entrypoint: /root/entrypoint.sh
     depends_on:
       puppet-server:
@@ -89,9 +89,9 @@ services:
         condition: service_started
       mongodb:
         condition: service_started
-    entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
+    entrypoint: "/usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh"
     environment:
-      GRAYLOG_NODE_ID_FILE: /usr/share/graylog/data/config/node-id
+      GRAYLOG_NODE_ID_FILE: "/usr/share/graylog/data/config/node-id"
       GRAYLOG_PASSWORD_SECRET: ${GRAYLOG_PASSWORD_SECRET}
       GRAYLOG_ROOT_PASSWORD_SHA2: ${GRAYLOG_ROOT_PASSWORD_SHA2S}
       GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
@@ -99,20 +99,20 @@ services:
       GRAYLOG_ELASTICSEARCH_HOSTS: http://elasticsearch:9200
       GRAYLOG_MONGODB_URI: mongodb://mongodb:27017/graylog
     ports:
-      - 5044:5044/tcp # Beats
-      - 5140:5140/udp # Syslog UDP
-      - 514:514/tcp # Syslog TCP
-      - 5140:5140/tcp # Syslog TCP
-      - 5555:5555/tcp # RAW TCP
-      - 5555:5555/udp # RAW TCP
-      - 9000:9000/tcp # Server API
-      - 12201:12201/tcp # GELF TCP
-      - 12201:12201/udp # GELF UDP
-      - 13301:13301/tcp # Forwarder data
-      - 13302:13302/tcp # Forwarder config
+      - "5044:5044/tcp" # Beats
+      - "5140:5140/udp" # Syslog UDP
+      - "514:514/tcp" # Syslog TCP
+      - "5140:5140/tcp" # Syslog TCP
+      - "5555:5555/tcp" # RAW TCP
+      - "5555:5555/udp" # RAW TCP
+      - "9000:9000/tcp" # Server API
+      - "12201:12201/tcp" # GELF TCP
+      - "12201:12201/udp" # GELF UDP
+      - "13301:13301/tcp" # Forwarder data
+      - "13302:13302/tcp" # Forwarder config
     volumes:
-      - graylog_data:/usr/share/graylog/data/data
-      - graylog_journal:/usr/share/graylog/data/journal
+      - "graylog_data:/usr/share/graylog/data/data"
+      - "graylog_journal:/usr/share/graylog/data/journal"
     restart: on-failure
     networks:
       - puppet
