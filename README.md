@@ -459,7 +459,7 @@ My big gotcha here, I don't know why https://domain.com/resource2 can't be reach
 
 I've got two possible workarounds but no time to implement them:
 
-- It seems that configuring ssl_only on /resource2 location may be the culprit.
+- It seems that configuring ssl_only on /resource2 location may be the culprit. Installing SSL certs on nginx-[1-2] could solve it.
 - Checking regex url for location.
 
 ## Logging (UNFINISHED :disappointed:)

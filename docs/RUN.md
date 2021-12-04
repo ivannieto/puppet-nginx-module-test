@@ -10,12 +10,11 @@
 
   - `docker compose up -d`
 
-- After agent has exited (or while container is in CREATED state) install required packages in Puppet server (latest versions gave me a headache, those are the ones that worked for me).
+- After agent has exited (or while container is in CREATED state and server is bootstraping) install required packages in Puppet server (latest versions gave me a headache, those are the ones that worked for me).
 
-  - `docker exec puppet-server puppet module install puppetlabs-apt --8.1.0`
-  - `docker exec puppet-server puppet module install puppet-nginx --version 3.2.0`
+  - `docker exec puppet-server puppet module install puppetlabs-apt --8.1.0; docker exec puppet-server puppet module install puppet-nginx --version 3.2.0`
 
-- Restart exited container to gather facts from Puppet server.
+- Restart (if exited) container to gather facts from Puppet server.
 
   `docker compose up -d`
 
@@ -37,3 +36,5 @@
 - If you need to rebuild all services.
 
   - `docker compose up -d --force-recreate --build`
+
+
